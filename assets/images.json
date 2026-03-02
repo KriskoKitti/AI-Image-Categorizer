@@ -1,0 +1,24 @@
+[
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\szakdoga\\assets\\person\\women\\chic.png",
+        "main_category": "person",
+        "subcategory": "women",
+        "tags": [
+            "women",
+            "street",
+            "outfits"
+        ],
+        "caption": "two women walking down the street in black outfits"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\szakdoga\\assets\\plant\\trees\\erdo.jpg",
+        "main_category": "plant",
+        "subcategory": "trees",
+        "tags": [
+            "forest",
+            "moss",
+            "trees"
+        ],
+        "caption": "a forest with moss and trees"
+    }
+]

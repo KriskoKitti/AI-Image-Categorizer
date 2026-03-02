@@ -1,0 +1,53 @@
+[
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\szakdoga\\assets\\person\\woman\\chic.png",
+        "main_category": "person",
+        "subcategory": "woman",
+        "tags": [
+            "woman",
+            "suit",
+            "sunglasses",
+            "sidewalk"
+        ],
+        "caption": "a woman in a black suit and sunglasses walking down a sidewalk"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\szakdoga\\assets\\animal\\horse\\cirkusz.png",
+        "main_category": "animal",
+        "subcategory": "horse",
+        "tags": [
+            "araffes",
+            "circus",
+            "ring",
+            "horse",
+            "rope"
+        ],
+        "caption": "araffes in a circus ring with a horse hanging from a rope"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\szakdoga\\assets\\person\\astronauts\\legjobb-sci-fi-konyvek.png",
+        "main_category": "person",
+        "subcategory": "astronauts",
+        "tags": [
+            "astronauts",
+            "planet",
+            "space",
+            "shuttle",
+            "background"
+        ],
+        "caption": "two astronauts standing on a red planet with a space shuttle in the background"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\szakdoga\\assets\\person\\astronauts\\legjobb-sci-fi-konyvek_1.png",
+        "main_category": "person",
+        "subcategory": "astronauts",
+        "tags": [
+            "astronauts",
+            "planet",
+            "space",
+            "shuttle",
+            "background"
+        ],
+        "caption": "two astronauts standing on a red planet with a space shuttle in the background"
+    }
+]

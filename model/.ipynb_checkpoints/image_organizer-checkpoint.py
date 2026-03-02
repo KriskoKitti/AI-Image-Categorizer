@@ -1,0 +1,53 @@
+import os
+import json
+import shutil
+from pathlib import Path
+from model.image_model import ImageModel  
+
+class ImageOrganizer:
+    def __init__(self, assets_dir=None, json_path=None):
+        self.model = ImageModel()
+
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+        self.assets_dir = assets_dir or os.path.join(base_dir, "assets")
+        self.json_path = json_path or os.path.join(self.assets_dir, "images.json")
+
+        if os.path.exists(self.json_path):
+            with open(self.json_path, "r", encoding="utf-8") as f:
+                self.data = json.load(f)
+        else:
+            self.data = []
+
+    def add_image(self, image_path):
+        result = self.model.analyze_image(image_path)
+        main_cat = result["main_category"]
+        sub_cat = result["subcategory"]
+        tags = result["tags"]
+        caption = result["caption"]
+
+        target_dir = os.path.join(self.assets_dir, main_cat, sub_cat)
+        os.makedirs(target_dir, exist_ok=True)
+
+        filename = os.path.basename(image_path)
+        target_path = os.path.join(target_dir, filename)
+
+        counter = 1
+        while os.path.exists(target_path):
+            name, ext = os.path.splitext(filename)
+            target_path = os.path.join(target_dir, f"{name}_{counter}{ext}")
+            counter += 1
+
+        shutil.copy(image_path, target_path)
+
+        self.data.append({
+            "filename": target_path,
+            "main_category": main_cat,
+            "subcategory": sub_cat,
+            "tags": tags,
+            "caption": caption
+        })
+
+        with open(self.json_path, "w", encoding="utf-8") as f:
+            json.dump(self.data, f, indent=4, ensure_ascii=False)
+
+        return target_path, result
