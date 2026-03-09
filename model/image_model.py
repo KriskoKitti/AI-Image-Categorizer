@@ -51,7 +51,7 @@ class ImageModel:
     def extract_nouns(self, caption):
         doc = self.nlp(caption)
         return [
-            token.text.lower()
+            token.lemma_.lower()
             for token in doc
             if token.pos_ in ("NOUN", "PROPN")
         ]
@@ -156,7 +156,6 @@ class ImageModel:
         ]
 
     def load_images(self, directory):
-        """Visszaadja az adott mappában lévő összes képet"""
         if not os.path.exists(directory):
             return []
 

@@ -3,6 +3,8 @@ from kivy.event import EventDispatcher
 from model.image_model import ImageModel
 from model.image_organizer import ImageOrganizer
 import os
+import json
+from nltk.corpus import wordnet as wn
 
 
 class ImageViewModel(EventDispatcher):
@@ -11,6 +13,7 @@ class ImageViewModel(EventDispatcher):
     images = ListProperty([])
     current_image = StringProperty("")
     index = NumericProperty(0)
+    search_results = ListProperty([])
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -83,3 +86,61 @@ class ImageViewModel(EventDispatcher):
         if self.index > 0:
             self.index -= 1
             self.current_image = self.images[self.index]
+
+    def extract_nouns(self, caption):
+        doc = self.nlp(caption)
+        return [
+            token.lemma_.lower()
+            for token in doc
+            if token.pos_ in ("NOUN", "PROPN")
+        ]
+    
+    def search_images(self, prompt: str):
+
+        json_path = os.path.join(self.get_assets_path(), "images.json")
+
+        if not os.path.exists(json_path):
+            return []
+
+        with open(json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # -------- PROMPT PROCESSING --------
+
+        prompt_tags = self.extract_nouns(prompt)
+
+        # lemma + synonym expansion
+        expanded_tags = set(prompt_tags)
+
+        for tag in prompt_tags:
+            for syn in wn.synsets(tag, pos=wn.NOUN):
+                for lemma in syn.lemmas():
+                    expanded_tags.add(lemma.name().lower())
+
+        # -------- IMAGE MATCHING --------
+
+        scored_results = []
+
+        for entry in data:
+            image_tags = [t.lower() for t in entry.get("tags", [])]
+
+            # intersection
+            matches = expanded_tags.intersection(image_tags)
+
+            if matches:
+                score = len(matches) / len(image_tags)
+
+                scored_results.append({
+                    "filename": entry["filename"],
+                    "score": score
+                })
+
+        # -------- SORT BY RELEVANCE --------
+
+        scored_results.sort(key=lambda x: x["score"], reverse=True)
+
+        results = [item["filename"] for item in scored_results]
+
+        self.search_results = results
+        return results
+
