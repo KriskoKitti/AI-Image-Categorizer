@@ -1,114 +1,15 @@
 [
     {
-        "filename": "C:\\Users\\Win11\\Documents\\python\\szakdoga\\assets\\person\\women\\chic.png",
-        "main_category": "person",
-        "subcategory": "women",
-        "tags": [
-            "women",
-            "street",
-            "outfits"
-        ],
-        "caption": "two women walking down the street in black outfits"
-    },
-    {
-        "filename": "C:\\Users\\Win11\\Documents\\python\\szakdoga\\assets\\plant\\trees\\erdo.jpg",
-        "main_category": "plant",
-        "subcategory": "trees",
-        "tags": [
-            "forest",
-            "moss",
-            "trees"
-        ],
-        "caption": "a forest with moss and trees"
-    },
-    {
-        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\vehicle\\tower\\Eiffelturm.jpg",
-        "main_category": "vehicle",
-        "subcategory": "tower",
-        "tags": [
-            "tower"
-        ],
-        "caption": "a very tall tower"
-    },
-    {
-        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\person\\man\\cirkusz.png",
-        "main_category": "person",
-        "subcategory": "man",
-        "tags": [
-            "man",
-            "suit",
-            "horse"
-        ],
-        "caption": "a man in a suit walking a white horse"
-    },
-    {
-        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\other\\unknown\\folyo.jpg",
-        "main_category": "other",
-        "subcategory": "unknown",
-        "tags": [
-            "view",
-            "rio",
-            "river",
-            "rio",
-            "valley"
-        ],
-        "caption": "aerial view of the rio river in the rio valley"
-    },
-    {
-        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\person\\planet\\legjobb-sci-fi-konyvek.png",
-        "main_category": "person",
-        "subcategory": "planet",
-        "tags": [
-            "screenshot",
-            "space",
-            "station",
-            "planet",
-            "background"
-        ],
-        "caption": "a screenshot of a space station with a red planet in the background"
-    },
-    {
-        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\building\\library\\library.png",
-        "main_category": "building",
-        "subcategory": "library",
-        "tags": [
-            "library",
-            "books",
-            "shelves"
-        ],
-        "caption": "a large library with many books on shelves"
-    },
-    {
         "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\person\\woman\\macska.png",
         "main_category": "person",
         "subcategory": "woman",
         "tags": [
             "woman",
             "cat",
-            "arms"
+            "arm"
         ],
-        "caption": "a woman holding a cat in her arms"
-    },
-    {
-        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\food\\picnic\\piknik.jpeg",
-        "main_category": "food",
-        "subcategory": "picnic",
-        "tags": [
-            "picnic",
-            "garden"
-        ],
-        "caption": "picnic in the garden"
-    },
-    {
-        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\person\\man\\sci-fi.png",
-        "main_category": "person",
-        "subcategory": "man",
-        "tags": [
-            "man",
-            "bridge",
-            "city"
-        ],
-        "caption": "a man standing on a bridge looking at a city"
+        "caption": "a woman holding a cat in her arms",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\macska.png.npy"
     },
     {
         "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\building\\church\\templom.jpg",
@@ -119,6 +20,7 @@
             "clock",
             "tower"
         ],
-        "caption": "a church with a clock tower"
+        "caption": "a church with a clock tower",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\templom.jpg.npy"
     }
 ]

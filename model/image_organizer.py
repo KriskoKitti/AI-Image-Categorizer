@@ -3,6 +3,7 @@ import json
 import shutil
 from pathlib import Path
 from model.image_model import ImageModel  
+import numpy as np
 
 class ImageOrganizer:
     def __init__(self, assets_dir=None, json_path=None):
@@ -39,12 +40,21 @@ class ImageOrganizer:
 
         shutil.copy(image_path, target_path)
 
+        embedding = self.model.get_image_embedding(target_path)
+
+        embedding_path = os.path.join(self.assets_dir, "embeddings")
+        os.makedirs(embedding_path, exist_ok=True)
+
+        emb_file = os.path.join(embedding_path, os.path.basename(target_path) + ".npy")
+        np.save(emb_file, embedding)
+
         self.data.append({
             "filename": target_path,
             "main_category": main_cat,
             "subcategory": sub_cat,
             "tags": tags,
-            "caption": caption
+            "caption": caption,
+            "embedding_file": emb_file
         })
 
         with open(self.json_path, "w", encoding="utf-8") as f:

@@ -17,8 +17,11 @@ class UploadScreen(Screen):
     
         layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
     
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+        assets_path = os.path.join(base_dir, "assets")
+
         self.file_chooser = FileChooserIconView(
-            path="C:/Users/Win11/Documents/python/szakdoga/assets",
+            path=assets_path,
             filters=['*.png', '*.jpg', '*.jpeg']
         )
     

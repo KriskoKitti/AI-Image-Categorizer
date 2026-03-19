@@ -5,6 +5,9 @@ import spacy
 import torch
 import nltk
 from nltk.corpus import wordnet as wn
+from transformers import CLIPProcessor, CLIPModel
+import clip
+import torch
 
 
 class ImageModel:
@@ -19,29 +22,84 @@ class ImageModel:
     }
     
     def __init__(self):
-        self.processor = BlipProcessor.from_pretrained(
-            "models/blip",
-            local_files_only=True
-        )
-        self.model = BlipForConditionalGeneration.from_pretrained(
-            "models/blip",
-            local_files_only=True
-        )
-        
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model.to(self.device)
+
+        self.blip_processor = BlipProcessor.from_pretrained(
+            "models/blip",
+            local_files_only=True
+        )
+        self.blip_model = BlipForConditionalGeneration.from_pretrained(
+            "models/blip",
+            local_files_only=True
+        )
+
+        # self.clip_model = CLIPModel.from_pretrained(
+        #     "openai/clip-vit-base-patch32",
+        #     cache_dir="models/clip",
+        #     local_files_only=True
+        # )
+        # self.clip_processor = CLIPProcessor.from_pretrained(
+        #     "openai/clip-vit-base-patch32",
+        #     cache_dir="models/clip",
+        #     local_files_only=True
+        # )
+
+        self.clip_model, self.clip_preprocess = clip.load("ViT-B/32", device=self.device)
+        
+        self.blip_model.to(self.device)
+        self.clip_model.to(self.device)
+        self.clip_model.eval()
         
         self.nlp = spacy.load("en_core_web_sm")
+
+    # ------------------- VECTOR ------------------------
+    def get_image_embedding(self, image_path):
+
+        image = Image.open(image_path).convert("RGB")
+        image_input = self.clip_preprocess(image).unsqueeze(0).to(self.device)
+
+        with torch.no_grad():
+            image_features = self.clip_model.encode_image(image_input) 
+
+        image_features /= image_features.norm(dim=-1, keepdim=True)
+
+        return image_features.squeeze().cpu()
+    
+    def get_text_embedding(self, prompt):
+        text = clip.tokenize([prompt]).to(self.device)
+
+        with torch.no_grad():
+            text_features = self.clip_model.encode_text(text)
+
+        text_features /= text_features.norm(dim=-1, keepdim=True)
+
+        return text_features
+    
+    def similarity(self, image_vec, text_vec):
+        image_vec = image_vec.to(self.device)
+        return torch.matmul(text_vec, image_vec.T).item()
+    
+    def search_clip(self, prompt, image_embeddings):
+        text_vec = self.get_text_embedding(prompt)
+
+        results = []
+
+        for filename, img_vec in image_embeddings.items():
+            score = self.similarity(img_vec, text_vec)
+            results.append((filename, score))
+
+        results.sort(key=lambda x: x[1], reverse=True)
+        return results
 
      # ---------------- CAPTION + TAG ----------------
 
     def generate_caption(self, image_path):
         image = Image.open(image_path).convert("RGB")
 
-        inputs = self.processor(images=image, return_tensors="pt").to(self.device)
-        output = self.model.generate(**inputs)
+        inputs = self.blip_processor(images=image, return_tensors="pt").to(self.device)
+        output = self.blip_model.generate(**inputs)
 
-        caption = self.processor.decode(
+        caption = self.blip_processor.decode(
             output[0],
             skip_special_tokens=True
         )
@@ -99,11 +157,14 @@ class ImageModel:
 
         main_category, subcategory = self.determine_category_from_tags(tags)
 
+        embedding = self.get_image_embedding(image_path)
+
         return {
             "caption": caption,
             "tags": tags,
             "main_category": main_category,
-            "subcategory": subcategory
+            "subcategory": subcategory,
+            "embedding": embedding
         }
 
     # ---------------- IMAGE / FOLDER LOADING ----------------
@@ -111,7 +172,6 @@ class ImageModel:
     def get_folders_with_thumbnails(self, base_path):
         """
         Visszaadja az assets mappa almappáit
-        mindegyikhez a thumbnail (első kép) útvonalát
         """
         result = []
 
