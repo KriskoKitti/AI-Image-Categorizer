@@ -47,21 +47,14 @@ class ImageViewModel(EventDispatcher):
         self.folders = self.model.get_subfolders(path)
 
     def select_folder(self, folder_name):
-        next_path = os.path.join(self.current_path, folder_name)
-    
-        subfolders = self.model.get_subfolders(next_path)
-        images = self.model.load_images(next_path)
-    
-        if subfolders:
-            self.load_folders(next_path)
-    
-        elif images:
-            self.images = images
-            self.index = 0
-            self.current_image = images[0]
-    
-        else:
-            self.folders = []
+        new_path = os.path.join(self.current_path, folder_name)
+        self.current_path = new_path
+
+        subfolders = self.model.get_subfolders(new_path)
+        images = self.model.load_images(new_path)
+
+        self.folders = subfolders
+        self.images = images
 
     def go_back_folder(self):
         if self.current_path != self.base_path:
@@ -97,56 +90,7 @@ class ImageViewModel(EventDispatcher):
             if token.pos_ in ("NOUN", "PROPN")
         ]
     
-    # def search_images(self, prompt: str):
-
-    #     json_path = os.path.join(self.get_assets_path(), "images.json")
-
-    #     if not os.path.exists(json_path):
-    #         return []
-
-    #     with open(json_path, "r", encoding="utf-8") as f:
-    #         data = json.load(f)
-
-    #     # -------- PROMPT PROCESSING --------
-
-    #     prompt_tags = self.extract_nouns(prompt)
-
-    #     # lemma + synonym expansion
-    #     expanded_tags = set(prompt_tags)
-
-    #     for tag in prompt_tags:
-    #         for syn in wn.synsets(tag, pos=wn.NOUN):
-    #             for lemma in syn.lemmas():
-    #                 expanded_tags.add(lemma.name().lower())
-
-    #     # -------- IMAGE MATCHING --------
-
-    #     scored_results = []
-
-    #     for entry in data:
-    #         image_tags = [t.lower() for t in entry.get("tags", [])]
-
-    #         # intersection
-    #         matches = expanded_tags.intersection(image_tags)
-
-    #         if matches:
-    #             score = len(matches) / len(image_tags)
-
-    #             scored_results.append({
-    #                 "filename": entry["filename"],
-    #                 "score": score
-    #             })
-
-    #     # -------- SORT BY RELEVANCE --------
-
-    #     scored_results.sort(key=lambda x: x["score"], reverse=True)
-
-    #     results = [item["filename"] for item in scored_results]
-
-    #     self.search_results = results
-    #     return results
-    
-    def search_images(self, prompt: str, threshold: float = 0.2):
+    def search_images(self, prompt: str, threshold: float = 0.25):
 
         json_path = os.path.join(self.get_assets_path(), "images.json")
 
@@ -156,8 +100,7 @@ class ImageViewModel(EventDispatcher):
         with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        # TEXT EMBEDDING
-        text_vec = self.model.get_text_embedding(prompt)  # already normalized
+        text_vec = self.model.get_text_embedding(prompt) 
 
         results = []
 
@@ -167,10 +110,8 @@ class ImageViewModel(EventDispatcher):
             if not emb_path or not os.path.exists(emb_path):
                 continue
 
-            # load numpy embedding
             image_vec = torch.from_numpy(np.load(emb_path)).float().to(self.model.device)
 
-            # normalize (IMPORTANT even if you think it's normalized)
             image_vec = image_vec / image_vec.norm(dim=-1, keepdim=True)
 
             score = torch.matmul(text_vec, image_vec).item()
@@ -188,4 +129,21 @@ class ImageViewModel(EventDispatcher):
         self.search_results = final
 
         return final
+    
+    def get_metadata(self, path):
+        for item in self.organizer.data:
+            if item["filename"] == path:
+                return item
+        return None
+    
+    def get_caption(self, path):
+        data = self.get_metadata(path)
+        return data["caption"] if data else ""
+
+    def get_tags(self, path):
+        data = self.get_metadata(path)
+        return data["tags"] if data else []
+
+    # def get_upload_date(self, path):
+    #     return time.ctime(os.path.getctime(path))
 

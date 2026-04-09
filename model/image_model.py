@@ -7,7 +7,6 @@ import nltk
 from nltk.corpus import wordnet as wn
 from transformers import CLIPProcessor, CLIPModel
 import clip
-import torch
 
 
 class ImageModel:
@@ -32,17 +31,6 @@ class ImageModel:
             "models/blip",
             local_files_only=True
         )
-
-        # self.clip_model = CLIPModel.from_pretrained(
-        #     "openai/clip-vit-base-patch32",
-        #     cache_dir="models/clip",
-        #     local_files_only=True
-        # )
-        # self.clip_processor = CLIPProcessor.from_pretrained(
-        #     "openai/clip-vit-base-patch32",
-        #     cache_dir="models/clip",
-        #     local_files_only=True
-        # )
 
         self.clip_model, self.clip_preprocess = clip.load("ViT-B/32", device=self.device)
         

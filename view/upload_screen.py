@@ -2,12 +2,9 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
-from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.filechooser import FileChooserIconView
-from kivy.uix.popup import Popup
+from kivy.uix.anchorlayout import AnchorLayout
 import os
 
 class UploadScreen(Screen):
@@ -16,6 +13,8 @@ class UploadScreen(Screen):
         self.viewmodel = viewmodel
     
         layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
+        contents = BoxLayout(orientation='horizontal', spacing=10, padding=10)
+        left_panel = BoxLayout(orientation='vertical', size_hint_x=0.5)
     
         base_dir = os.path.dirname(os.path.dirname(__file__))
         assets_path = os.path.join(base_dir, "assets")
@@ -24,20 +23,40 @@ class UploadScreen(Screen):
             path=assets_path,
             filters=['*.png', '*.jpg', '*.jpeg']
         )
+        self.file_chooser.size_hint_y = 0.9
+        self.file_chooser.dirselect = True
+
+        right_panel = BoxLayout(orientation='vertical', size_hint_x=0.5)
     
-        self.preview = Image(size_hint=(1, 0.5))
-        self.tags_label = Label(text="Tags itt jelennek meg")
+        self.preview = Image(size_hint_y=0.7)
+        self.tags_label = Label(
+            text="Tags will appear here",
+            size_hint_y=0.3
+        )
 
-        select_btn = Button(text="Kép feldolgozása")
+        select_btn_layout = AnchorLayout(
+            anchor_x='center',
+            anchor_y='bottom',
+            size_hint=(1, None),
+            height=60
+        )
+        select_btn = Button(text="Analyze image", size_hint=(None, None), size=(400, 60))
         select_btn.bind(on_press=self.process_image)
+        select_btn_layout.add_widget(select_btn)
 
-        layout.add_widget(self.file_chooser)
-        layout.add_widget(select_btn)
-        layout.add_widget(self.preview)
-        layout.add_widget(self.tags_label)
+        # layout.add_widget(self.file_chooser)
+        left_panel.add_widget(self.file_chooser)
+        left_panel.add_widget(select_btn_layout)
+
+        right_panel.add_widget(self.preview)
+        right_panel.add_widget(self.tags_label)
+
+        contents.add_widget(left_panel)
+        contents.add_widget(right_panel)
+        layout.add_widget(contents)
 
         # Back button
-        back_btn = Button(text="Vissza", size_hint_y=None, height=50)
+        back_btn = Button(text="Back", size_hint_y=None, height=80)
         back_btn.bind(on_press=self.go_back)
         layout.add_widget(back_btn)
 
@@ -55,7 +74,6 @@ class UploadScreen(Screen):
 
             saved_path, result = self.viewmodel.organizer.add_image(filepath)
     
-            #Kiíratás
             tags = result["tags"]
             main_cat = result["main_category"]
             subcat = result["subcategory"]
@@ -63,8 +81,7 @@ class UploadScreen(Screen):
     
             self.tags_label.text = (
                 f"Caption: {caption}\n"
-                f"Kategória: {main_cat}/{subcat}\n"
-                f"Tagek: {', '.join(tags)}\n"
-                f"Mentve ide: {saved_path}"
+                f"Category: {main_cat}/{subcat}\n"
+                f"Tags: {', '.join(tags)}\n"
             )
             

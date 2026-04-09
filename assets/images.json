@@ -22,5 +22,160 @@
         ],
         "caption": "a church with a clock tower",
         "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\templom.jpg.npy"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\building\\library\\library.png",
+        "main_category": "building",
+        "subcategory": "library",
+        "tags": [
+            "library",
+            "book",
+            "shelf"
+        ],
+        "caption": "a large library with many books on shelves",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\library.png.npy"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\building\\library\\library_1.png",
+        "main_category": "building",
+        "subcategory": "library",
+        "tags": [
+            "library",
+            "book",
+            "shelf"
+        ],
+        "caption": "a large library with many books on shelves",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\library_1.png.npy"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\person\\man\\sci-fi.png",
+        "main_category": "person",
+        "subcategory": "man",
+        "tags": [
+            "man",
+            "bridge",
+            "city"
+        ],
+        "caption": "a man standing on a bridge looking at a city",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\sci-fi.png.npy"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\person\\planet\\legjobb-sci-fi-konyvek.png",
+        "main_category": "person",
+        "subcategory": "planet",
+        "tags": [
+            "screenshot",
+            "space",
+            "station",
+            "planet",
+            "background"
+        ],
+        "caption": "a screenshot of a space station with a red planet in the background",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\legjobb-sci-fi-konyvek.png.npy"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\food\\picnic\\piknik.jpeg",
+        "main_category": "food",
+        "subcategory": "picnic",
+        "tags": [
+            "picnic",
+            "garden"
+        ],
+        "caption": "picnic in the garden",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\piknik.jpeg.npy"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\person\\planet\\legjobb-sci-fi-konyvek_1.png",
+        "main_category": "person",
+        "subcategory": "planet",
+        "tags": [
+            "screenshot",
+            "space",
+            "station",
+            "planet",
+            "background"
+        ],
+        "caption": "a screenshot of a space station with a red planet in the background",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\legjobb-sci-fi-konyvek_1.png.npy"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\vehicle\\tower\\Eiffelturm.jpg",
+        "main_category": "vehicle",
+        "subcategory": "tower",
+        "tags": [
+            "tower"
+        ],
+        "caption": "a very tall tower",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\Eiffelturm.jpg.npy"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\person\\woman\\macska_1.png",
+        "main_category": "person",
+        "subcategory": "woman",
+        "tags": [
+            "woman",
+            "cat",
+            "arm"
+        ],
+        "caption": "a woman holding a cat in her arms",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\macska_1.png.npy"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\person\\woman\\chic.png",
+        "main_category": "person",
+        "subcategory": "woman",
+        "tags": [
+            "woman",
+            "street",
+            "outfit"
+        ],
+        "caption": "two women walking down the street in black outfits",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\chic.png.npy"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\building\\library\\library_2.png",
+        "main_category": "building",
+        "subcategory": "library",
+        "tags": [
+            "library",
+            "book",
+            "shelf"
+        ],
+        "caption": "a large library with many books on shelves",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\library_2.png.npy"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\food\\picnic\\piknik_1.jpeg",
+        "main_category": "food",
+        "subcategory": "picnic",
+        "tags": [
+            "picnic",
+            "garden"
+        ],
+        "caption": "picnic in the garden",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\piknik_1.jpeg.npy"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\building\\building\\unnamed.jpg",
+        "main_category": "building",
+        "subcategory": "building",
+        "tags": [
+            "building",
+            "lawn",
+            "hill"
+        ],
+        "caption": "a building with a green lawn and a hill",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\unnamed.jpg.npy"
+    },
+    {
+        "filename": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\animal\\lion\\images.jpg",
+        "main_category": "animal",
+        "subcategory": "lion",
+        "tags": [
+            "lion",
+            "rock"
+        ],
+        "caption": "a lion laying on a rock",
+        "embedding_file": "C:\\Users\\Win11\\Documents\\python\\AI-Image-Categorizer\\assets\\embeddings\\images.jpg.npy"
     }
 ]
