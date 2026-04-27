@@ -7,7 +7,7 @@ import nltk
 from nltk.corpus import wordnet as wn
 from transformers import CLIPProcessor, CLIPModel
 import clip
-
+from PIL.ExifTags import TAGS
 
 class ImageModel:
     MAIN_CATEGORIES = {
@@ -147,12 +147,15 @@ class ImageModel:
 
         embedding = self.get_image_embedding(image_path)
 
+        date = self.get_image_date(image_path)
+
         return {
             "caption": caption,
             "tags": tags,
             "main_category": main_category,
             "subcategory": subcategory,
-            "embedding": embedding
+            "embedding": embedding,
+            "created_at": date
         }
 
     # ---------------- IMAGE / FOLDER LOADING ----------------
@@ -213,3 +216,16 @@ class ImageModel:
             if f.lower().endswith(('.png', '.jpg', '.jpeg'))
         ]
 
+    def get_image_date(self, path):
+        image = Image.open(path)
+        exif = image._getexif()
+
+        if not exif:
+            return None
+
+        for tag, value in exif.items():
+            tag_name = TAGS.get(tag, tag)
+            if tag_name == "DateTimeOriginal":
+                return value
+
+        return None

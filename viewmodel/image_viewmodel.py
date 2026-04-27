@@ -7,7 +7,8 @@ import json
 from nltk.corpus import wordnet as wn
 import torch
 import numpy as np
-
+import re
+from datetime import datetime
 
 class ImageViewModel(EventDispatcher):
 
@@ -33,6 +34,53 @@ class ImageViewModel(EventDispatcher):
 
     def save_image(self, image_path):
         return self.organizer.add_image(image_path)
+    
+    def update_image_data(self, image_path, filename, date, tags):
+
+        # --- VALIDÁLÁS ---
+        if not filename:
+            raise ValueError("Fájlnév nem lehet üres")
+
+        if re.search(r'[<>:"/\\|?*]', filename):
+            raise ValueError("Érvénytelen karakter a fájlnévben")
+
+        # dátum
+        if date:
+            try:
+                datetime.strptime(date, "%Y-%m-%d")
+            except:
+                raise ValueError("Dátum formátum: YYYY-MM-DD")
+
+        # tagek tisztítása
+        clean_tags = list(set(tag.strip().lower() for tag in tags if tag.strip()))
+
+        # --- FÁJL ÁTNEVEZÉS ---
+        dir_path = os.path.dirname(image_path)
+        ext = os.path.splitext(image_path)[1]
+        new_path = os.path.join(dir_path, filename + ext)
+
+        if new_path != image_path:
+            os.rename(image_path, new_path)
+
+            # embedding fájl átnevezése is!
+            old_emb = image_path + ".npy"
+            new_emb = new_path + ".npy"
+
+            if os.path.exists(old_emb):
+                os.rename(old_emb, new_emb)
+
+
+        # --- MODEL UPDATE ---
+        self.organizer.update_image(
+            image_path,
+            {
+                "filename": new_path,
+                "tags": clean_tags,
+                "created_at": date
+            }
+        )
+
+        return image_path
     
     # ---------------- PATH ----------------
 
@@ -90,7 +138,7 @@ class ImageViewModel(EventDispatcher):
             if token.pos_ in ("NOUN", "PROPN")
         ]
     
-    def search_images(self, prompt: str, threshold: float = 0.25):
+    def search_images(self, prompt: str, threshold: float = 0.20):
 
         json_path = os.path.join(self.get_assets_path(), "images.json")
 
@@ -144,6 +192,15 @@ class ImageViewModel(EventDispatcher):
         data = self.get_metadata(path)
         return data["tags"] if data else []
 
-    # def get_upload_date(self, path):
-    #     return time.ctime(os.path.getctime(path))
+    def get_upload_date(self, path):
+        data = self.get_metadata(path)
+        return data["created_at"] if data else []
+    
+    def get_main_category(self, path):
+        data = self.get_metadata(path)
+        return data["main_category"] if data else []
+    
+    def get_subcategory(self, path):
+        data = self.get_metadata(path)
+        return data["subcategory"] if data else []
 

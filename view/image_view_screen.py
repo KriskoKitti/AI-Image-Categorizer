@@ -2,6 +2,8 @@ from kivy.uix.screenmanager import Screen, SlideTransition
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.uix.button import Button
+from kivy.factory import Factory
+from kivy.uix.anchorlayout import AnchorLayout
 
 class ImageViewScreen(Screen):
     def __init__(self, viewmodel, **kwargs):
@@ -15,17 +17,23 @@ class ImageViewScreen(Screen):
         layout.add_widget(self.img_widget)
 
         # --- Prev/Next gombok ---
-        btn_layout = BoxLayout(size_hint=(1, 0.1))
-        prev_btn = Button(text="Prev")
-        next_btn = Button(text="Next")
-        btn_layout.add_widget(prev_btn)
-        btn_layout.add_widget(next_btn)
-        layout.add_widget(btn_layout)
+        # btn_layout = BoxLayout(size_hint=(1, 0.1))
+        # prev_btn = Button(text="Prev")
+        # next_btn = Button(text="Next")
+        # btn_layout.add_widget(prev_btn)
+        # btn_layout.add_widget(next_btn)
+        # layout.add_widget(btn_layout)
 
         # --- Vissza gomb ---
-        back_btn = Button(text="Back", size_hint=(1, 0.1))
+        back_btn = Factory.RoundedButton(text="Back", size_hint_y=1, size_hint_x=None, width=100)
         back_btn.bind(on_press=self.go_back)
-        layout.add_widget(back_btn)
+
+        back_layout = BoxLayout(size_hint_y=None, height=80, spacing=20)
+        back_anchor = AnchorLayout(anchor_x='right', anchor_y='center')
+
+        back_anchor.add_widget(back_btn)
+        back_layout.add_widget(back_anchor)
+        layout.add_widget(back_layout)
 
         self.add_widget(layout)
 
@@ -33,8 +41,8 @@ class ImageViewScreen(Screen):
         # self.viewmodel.bind(current_image=self.update_image)
 
         # --- Gomb események ---
-        prev_btn.bind(on_press=lambda x: self.viewmodel.prev_image())
-        next_btn.bind(on_press=lambda x: self.viewmodel.next_image())
+        # prev_btn.bind(on_press=lambda x: self.viewmodel.prev_image())
+        # next_btn.bind(on_press=lambda x: self.viewmodel.next_image())
 
     def on_enter(self):
         self.viewmodel.bind(current_image=self.update_image)

@@ -25,6 +25,7 @@ class ImageOrganizer:
         sub_cat = result["subcategory"]
         tags = result["tags"]
         caption = result["caption"]
+        image_date = result["created_at"]
 
         target_dir = os.path.join(self.assets_dir, main_cat, sub_cat)
         os.makedirs(target_dir, exist_ok=True)
@@ -48,16 +49,63 @@ class ImageOrganizer:
         emb_file = os.path.join(embedding_path, os.path.basename(target_path) + ".npy")
         np.save(emb_file, embedding)
 
+
         self.data.append({
             "filename": target_path,
             "main_category": main_cat,
             "subcategory": sub_cat,
             "tags": tags,
             "caption": caption,
-            "embedding_file": emb_file
+            "embedding_file": emb_file,
+            "created_at": image_date
         })
 
         with open(self.json_path, "w", encoding="utf-8") as f:
             json.dump(self.data, f, indent=4, ensure_ascii=False)
 
         return target_path, result
+
+    def update_image(self, image_path, new_data: dict):
+        for item in self.data:
+            if item["filename"] == image_path:
+                item.update(new_data)
+
+                # embedding path fix
+                item["embedding_file"] = new_data["filename"] + ".npy"
+                break
+
+        self._save_json()
+
+    def delete_image(self, image_path):
+        self.data = [
+            item for item in self.data
+            if item["filename"] != image_path
+        ]
+
+        self._save_json()
+
+    def move_image(self, image_path, new_main, new_sub):
+        for item in self.data:
+            if item["filename"] == image_path:
+
+                filename = os.path.basename(image_path)
+
+                new_dir = os.path.join(self.assets_dir, new_main, new_sub)
+                os.makedirs(new_dir, exist_ok=True)
+
+                new_path = os.path.join(new_dir, filename)
+
+                shutil.move(image_path, new_path)
+
+                # JSON update
+                item["filename"] = new_path
+                item["main_category"] = new_main
+                item["subcategory"] = new_sub
+
+                break
+
+        self._save_json()
+
+    def _save_json(self):
+        with open(self.json_path, "w", encoding="utf-8") as f:
+            json.dump(self.data, f, indent=4, ensure_ascii=False)
