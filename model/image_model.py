@@ -3,9 +3,7 @@ from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
 import spacy
 import torch
-import nltk
 from nltk.corpus import wordnet as wn
-from transformers import CLIPProcessor, CLIPModel
 import clip
 from PIL.ExifTags import TAGS
 
@@ -64,8 +62,10 @@ class ImageModel:
         return text_features
     
     def similarity(self, image_vec, text_vec):
-        image_vec = image_vec.to(self.device)
-        return torch.matmul(text_vec, image_vec.T).item()
+        image_vec = image_vec.float().to(self.device)
+        image_vec = image_vec / image_vec.norm(dim=-1, keepdim=True)
+
+        return (text_vec @ image_vec).item()
     
     def search_clip(self, prompt, image_embeddings):
         text_vec = self.get_text_embedding(prompt)
@@ -158,74 +158,22 @@ class ImageModel:
             "created_at": date
         }
 
-    # ---------------- IMAGE / FOLDER LOADING ----------------
-
-    def get_folders_with_thumbnails(self, base_path):
-        """
-        Visszaadja az assets mappa almappáit
-        """
-        result = []
-
-        if not os.path.exists(base_path):
-            return result
-
-        folders = [
-            f for f in os.listdir(base_path)
-            if os.path.isdir(os.path.join(base_path, f))
-            and not f.startswith(".")
-            and not f.endswith("checkpoints")
-            and f != "__pycache__"
-        ]
-
-        for folder in folders:
-            folder_path = os.path.join(base_path, folder)
-
-            images = [
-                f for f in os.listdir(folder_path)
-                if f.lower().endswith(('.png', '.jpg', '.jpeg'))
-            ]
-
-            thumb_path = os.path.join(folder_path, images[0]) if images else ""
-
-            result.append({
-                "name": folder,
-                "thumb": thumb_path
-            })
-
-        return result
-
-    def get_subfolders(self, path):
-        if not os.path.exists(path):
-            return []
-    
-        return [
-            {"name": f}
-            for f in os.listdir(path)
-            if os.path.isdir(os.path.join(path, f))
-            and not f.startswith(".")
-            and f != "__pycache__"
-        ]
-
-    def load_images(self, directory):
-        if not os.path.exists(directory):
-            return []
-
-        return [
-            os.path.join(directory, f)
-            for f in os.listdir(directory)
-            if f.lower().endswith(('.png', '.jpg', '.jpeg'))
-        ]
+    # ---------------- IMAGE DATE ----------------
 
     def get_image_date(self, path):
-        image = Image.open(path)
-        exif = image._getexif()
+        try:
+            image = Image.open(path)
+            exif = image._getexif()
 
-        if not exif:
+            if not exif:
+                return None
+
+            for tag, value in exif.items():
+                tag_name = TAGS.get(tag, tag)
+                if tag_name == "DateTimeOriginal":
+                    return value
+
             return None
 
-        for tag, value in exif.items():
-            tag_name = TAGS.get(tag, tag)
-            if tag_name == "DateTimeOriginal":
-                return value
-
-        return None
+        except Exception:
+            return None

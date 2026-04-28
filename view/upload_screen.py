@@ -48,6 +48,7 @@ class UploadScreen(Screen):
             valign="top",
             color=(119/255, 124/255, 109/255, 1)
         )
+        self.tags_label.bind(size=self.update_label_size)
 
         nav_layout = BoxLayout(size_hint_y=None, height=50, spacing=10)
 
@@ -100,16 +101,30 @@ class UploadScreen(Screen):
         if not self.images_data:
             return
 
-        filepath, result = self.images_data[self.current_index]
+        saved_path, result = self.images_data[self.current_index]
+
+        if not os.path.exists(saved_path):
+            print("Nem létezik a kép:", saved_path)
+            return
+
+        Clock.schedule_once(lambda dt: self.update_preview(saved_path, result), 0)
+
+    def update_preview(self, filepath, result):
+        self.preview.source = ""
+        self.preview.reload()
 
         self.preview.source = filepath
         self.preview.reload()
+
+        total = len(self.images_data)
+        current = self.current_index + 1
 
         self.tags_label.text = (
             f"Caption: {result['caption']}\n"
             f"Category: {result['main_category']}/{result['subcategory']}\n"
             f"Tags: {', '.join(result['tags'])}\n"
-            f"Date: {result['created_at']}\n"
+            f"Date: {result.get('created_at')}\n"
+            f"[{current}/{total}]\n"
         )
 
     def start_processing(self, instance):
@@ -131,8 +146,8 @@ class UploadScreen(Screen):
                 break
             
             print(path)
-            result = self.viewmodel.organizer.add_image(path)
-            self.images_data.append((result[0], result[1]))
+            saved_path, result = self.viewmodel.organizer.add_image(path)
+            self.images_data.append((saved_path, result))
 
             progress = (i + 1) / total * 100
 
@@ -183,3 +198,6 @@ class UploadScreen(Screen):
         if self.current_index > 0:
             self.current_index -= 1
             self.show_current_image()
+
+    def update_label_size(self, instance, value):
+        instance.text_size = (instance.width, None)

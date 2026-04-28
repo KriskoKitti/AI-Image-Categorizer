@@ -4,11 +4,16 @@
 
     canvas.before:
         Color:
-            rgba: 119/255, 124/255, 109/255, 1
+            rgba: (183/255, 184/255, 159/255, 1) if self.active else (119/255, 124/255, 109/255, 1)
         RoundedRectangle:
             pos: self.pos
             size: self.size
             radius: [15]
+        Color:
+            rgba: (119/255, 124/255, 109/255, 1)  
+        Line:
+            rounded_rectangle: (self.x, self.y, self.width, self.height, 15)
+            width: 1.5
 
 [FileIconEntry@Widget]:
     locked: False

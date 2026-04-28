@@ -14,6 +14,7 @@ class EditorScreen(Screen):
         super().__init__(**kwargs)
         self.viewmodel = viewmodel
         self.tags = []
+        self.return_screen = "main"
 
         root = BoxLayout(orientation='horizontal', padding=10, spacing=10)
         right_box = BoxLayout(orientation='vertical', padding=10, spacing=10)
@@ -134,7 +135,7 @@ class EditorScreen(Screen):
         self.refresh_tags()
 
     def go_back(self, instance):
-        self.manager.current = "main"
+        self.manager.current = self.return_screen
 
     #------ Tagek -------
     def refresh_tags(self):
@@ -173,8 +174,7 @@ class EditorScreen(Screen):
             )
 
             self.current_path = new_path
-            self.manager.get_screen("main").show_files()
-            self.manager.current = "main"
+            self.manager.current = self.return_screen
 
         except Exception as e:
             self.show_error(str(e))

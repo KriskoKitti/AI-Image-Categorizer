@@ -82,24 +82,35 @@ class ImageViewModel(EventDispatcher):
 
         return image_path
     
+    # --------------DELETE -----------------
+
+    def delete_image(self, image_path):
+        self.organizer.delete_image(image_path)
+
+        if image_path in self.images:
+            self.images.remove(image_path)
+
+        if self.current_image == image_path:
+            self.current_image = ""
+    
     # ---------------- PATH ----------------
 
     def get_assets_path(self):
         base_dir = os.path.dirname(os.path.dirname(__file__))
-        return os.path.join(base_dir, "assets")
+        return os.path.join(base_dir, "assets", "images")
 
     # ---------------- FOLDERS ----------------
 
     def load_folders(self, path):
         self.current_path = path
-        self.folders = self.model.get_subfolders(path)
+        self.folders = self.organizer.get_subfolders(path)
 
     def select_folder(self, folder_name):
         new_path = os.path.join(self.current_path, folder_name)
         self.current_path = new_path
 
-        subfolders = self.model.get_subfolders(new_path)
-        images = self.model.load_images(new_path)
+        subfolders = self.organizer.get_subfolders(new_path)
+        images = self.organizer.load_images(new_path)
 
         self.folders = subfolders
         self.images = images
@@ -112,7 +123,7 @@ class ImageViewModel(EventDispatcher):
     # ---------------- IMAGES ----------------
 
     def load_directory(self, directory):
-        self.images = self.model.load_images(directory)
+        self.images = self.organizer.load_images(directory)
         self.index = 0
 
         if self.images:
@@ -140,7 +151,8 @@ class ImageViewModel(EventDispatcher):
     
     def search_images(self, prompt: str, threshold: float = 0.20):
 
-        json_path = os.path.join(self.get_assets_path(), "images.json")
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+        json_path = os.path.join(base_dir, "assets", "images.json")
 
         if not os.path.exists(json_path):
             return []

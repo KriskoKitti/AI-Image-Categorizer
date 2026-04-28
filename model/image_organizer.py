@@ -1,17 +1,26 @@
 import os
 import json
 import shutil
-from pathlib import Path
 from model.image_model import ImageModel  
 import numpy as np
 
 class ImageOrganizer:
+    IMAGE_EXTENSIONS = ('.png', '.jpg', '.jpeg')
+
     def __init__(self, assets_dir=None, json_path=None):
         self.model = ImageModel()
 
         base_dir = os.path.dirname(os.path.dirname(__file__))
+
         self.assets_dir = assets_dir or os.path.join(base_dir, "assets")
+        self.images_dir = os.path.join(self.assets_dir, "images")
+        self.embeddings_dir = os.path.join(self.assets_dir, "embeddings")
+
         self.json_path = json_path or os.path.join(self.assets_dir, "images.json")
+
+        os.makedirs(self.assets_dir, exist_ok=True)
+        os.makedirs(self.images_dir, exist_ok=True)
+        os.makedirs(self.embeddings_dir, exist_ok=True)
 
         if os.path.exists(self.json_path):
             with open(self.json_path, "r", encoding="utf-8") as f:
@@ -19,15 +28,18 @@ class ImageOrganizer:
         else:
             self.data = []
 
+    # ----------- SAVE -----------------
+
     def add_image(self, image_path):
         result = self.model.analyze_image(image_path)
+
         main_cat = result["main_category"]
         sub_cat = result["subcategory"]
         tags = result["tags"]
         caption = result["caption"]
         image_date = result["created_at"]
 
-        target_dir = os.path.join(self.assets_dir, main_cat, sub_cat)
+        target_dir = os.path.join(self.images_dir, main_cat, sub_cat)
         os.makedirs(target_dir, exist_ok=True)
 
         filename = os.path.basename(image_path)
@@ -43,7 +55,7 @@ class ImageOrganizer:
 
         embedding = self.model.get_image_embedding(target_path)
 
-        embedding_path = os.path.join(self.assets_dir, "embeddings")
+        embedding_path = os.path.join(self.embeddings_dir, "embeddings")
         os.makedirs(embedding_path, exist_ok=True)
 
         emb_file = os.path.join(embedding_path, os.path.basename(target_path) + ".npy")
@@ -64,6 +76,8 @@ class ImageOrganizer:
             json.dump(self.data, f, indent=4, ensure_ascii=False)
 
         return target_path, result
+    
+    # --------------- UPDATE ----------------
 
     def update_image(self, image_path, new_data: dict):
         for item in self.data:
@@ -77,10 +91,18 @@ class ImageOrganizer:
         self._save_json()
 
     def delete_image(self, image_path):
-        self.data = [
-            item for item in self.data
-            if item["filename"] != image_path
-        ]
+        for item in self.data:
+            if item["filename"] == image_path:
+                embedding_file = item.get("embedding_file")
+
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+
+                if embedding_file and os.path.exists(embedding_file):
+                    os.remove(embedding_file)
+
+                self.data.remove(item)
+                break
 
         self._save_json()
 
@@ -90,7 +112,7 @@ class ImageOrganizer:
 
                 filename = os.path.basename(image_path)
 
-                new_dir = os.path.join(self.assets_dir, new_main, new_sub)
+                new_dir = os.path.join(self.images_dir, new_main, new_sub)
                 os.makedirs(new_dir, exist_ok=True)
 
                 new_path = os.path.join(new_dir, filename)
@@ -109,3 +131,26 @@ class ImageOrganizer:
     def _save_json(self):
         with open(self.json_path, "w", encoding="utf-8") as f:
             json.dump(self.data, f, indent=4, ensure_ascii=False)
+
+    
+    def get_subfolders(self, path):
+        if not os.path.exists(path):
+            return []
+    
+        return [
+            {"name": f}
+            for f in os.listdir(path)
+            if os.path.isdir(os.path.join(path, f))
+            and not f.startswith(".")
+            and f != "__pycache__"
+        ]
+
+    def load_images(self, directory):
+        if not os.path.exists(directory):
+            return []
+
+        return [
+            os.path.join(directory, f)
+            for f in os.listdir(directory)
+            if f.lower().endswith(('.png', '.jpg', '.jpeg'))
+        ]

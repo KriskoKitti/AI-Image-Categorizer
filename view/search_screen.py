@@ -12,17 +12,20 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 import os
+from kivy.properties import BooleanProperty
 
 class ClickableBoxLayout(ButtonBehavior, BoxLayout):
     pass
+
+class RoundedButton(Button):
+    active = BooleanProperty(False)
+
 
 class SearchScreen(Screen):
     def __init__(self, viewmodel, **kwargs):
         super().__init__(**kwargs)
         self.viewmodel = viewmodel
         self.images = []
-        self.sort_mode = "name"
-        self.active_tags = set()
 
         layout = BoxLayout(orientation="vertical", spacing=10, padding=10)
 
@@ -39,24 +42,7 @@ class SearchScreen(Screen):
         search_btn.bind(on_press=self.on_search)
         search_btn_layout.add_widget(search_btn)
         layout.add_widget(search_btn_layout)
-
-        self.sort_btn = Factory.RoundedButton(text="Sort: Name", 
-                               size_hint_x=None, 
-                               width=300)
-        self.sort_btn.bind(on_press=self.toggle_sort)
-
-        self.filter_btn = Factory.RoundedButton(text="Filter tags", 
-                                 size_hint_x=None, 
-                                 width=300)
-        self.filter_btn.bind(on_press=self.open_filter)
-
-        sort_layout = BoxLayout(size_hint_y=None, height=80, spacing=20)
-        sort_space = BoxLayout(size_hint_x=1)
-
-        sort_layout.add_widget(sort_space)
-        sort_layout.add_widget(self.sort_btn)
-        sort_layout.add_widget(self.filter_btn)
-
+        
         self.scroll = ScrollView(size_hint=(1, 1), do_scroll_x=False)
 
         self.file_list = GridLayout(
@@ -83,7 +69,7 @@ class SearchScreen(Screen):
 
         self.add_widget(layout)
 
-        # self.viewmodel.bind(search_results=self.show_files)
+
 
     def on_search(self, instance):
         prompt = self.prompt_input.text.strip()
@@ -101,13 +87,12 @@ class SearchScreen(Screen):
     def refresh_files(self):
         images = self.images
 
-        images = self.filter_images(images)
-        images = self.sort_images(images)
-
         self.file_list.clear_widgets()
 
         for image_path in images:
             self.file_list.add_widget(self.create_file_item(image_path))
+
+        Clock.schedule_once(lambda dt: setattr(self.scroll, "scroll_y", 1))
 
     def show_files(self, instance, results):
         self.refresh_files()
@@ -121,7 +106,7 @@ class SearchScreen(Screen):
         layout = ClickableBoxLayout(
             orientation='horizontal',
             size_hint_y=None,
-            height=140,
+            height=150,
             spacing=10,
             padding=10
         )
@@ -201,9 +186,18 @@ class SearchScreen(Screen):
 
         edit_btn.bind(on_press=lambda x: self.open_editor(img_path))
 
+        delete_btn = Factory.RoundedButton(
+            text="Delete",
+            size_hint=(None, 1),
+            width=120
+        )
+
+        delete_btn.bind(on_press=lambda x, path=img_path: self.confirm_delete(path))
+
         layout.add_widget(img)
         layout.add_widget(info)
         layout.add_widget(edit_btn)
+        layout.add_widget(delete_btn)
 
         layout.bind(on_press=lambda instance: self.open_viewer(img_path))
 
@@ -219,74 +213,45 @@ class SearchScreen(Screen):
         viewer.set_images([img_path])
         self.manager.current = "viewer"
 
-    def filter_images(self, images):
-        if not self.active_tags:
-            return images
-
-        result = []
-        for img in images:
-            tags = set(self.viewmodel.get_tags(img))
-            if self.active_tags.intersection(tags):
-                result.append(img)
-
-        return result
-    
-    def sort_images(self, images):
-        if self.sort_mode == "name":
-            return sorted(images, key=lambda x: os.path.basename(x))
-
-        elif self.sort_mode == "date":
-            return sorted(images, key=lambda x: self.viewmodel.get_upload_date(x) or "")
-
-        return images
-    
-    def filter_images(self, images):
-        if not self.active_tags:
-            return images
-
-        return [
-            img for img in images
-            if self.active_tags.intersection(set(self.viewmodel.get_tags(img)))
-        ]
-    
-    def toggle_sort(self, instance):
-        if self.sort_mode == "name":
-            self.sort_mode = "date"
-            instance.text = "Sort: Date"
-        else:
-            self.sort_mode = "name"
-            instance.text = "Sort: Name"
-
-        self.refresh_files()
-
-    def open_filter(self, instance):
-        layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
-
-        self.tag_input = TextInput(hint_text="pl: animal, person")
-        apply_btn = Button(text="Apply filter")
-
-        layout.add_widget(self.tag_input)
-        layout.add_widget(apply_btn)
-
-        popup = Popup(
-            title="Filter by tags",
-            content=layout,
-            size_hint=(0.6, 0.4)
-        )
-
-        def apply(_):
-            tags = [t.strip() for t in self.tag_input.text.split(",") if t.strip()]
-            self.set_tag_filter(tags)
-            popup.dismiss()
-
-        apply_btn.bind(on_press=apply)
-
-        popup.open()
-
     def open_editor(self, img_path):
         editor_screen = self.manager.get_screen("editor")
-
-        # átadjuk a kiválasztott képet
         editor_screen.load_image_data(img_path)
-
+        editor_screen.return_screen = "search"
         self.manager.current = "editor"
+
+    def confirm_delete(self, img_path):
+        content = BoxLayout(orientation="vertical", spacing=10, padding=10)
+
+        content.add_widget(Label(text="Are you sure you want to delete this image?"))
+
+        buttons = BoxLayout(size_hint_y=None, height=50, spacing=10)
+
+        cancel_btn = Button(text="Cancel")
+        delete_btn = Button(text="Delete")
+
+        buttons.add_widget(cancel_btn)
+        buttons.add_widget(delete_btn)
+
+        content.add_widget(buttons)
+
+        popup = Popup(
+            title="Delete image",
+            content=content,
+            size_hint=(0.6, 0.35),
+            auto_dismiss=False
+        )
+
+        cancel_btn.bind(on_press=popup.dismiss)
+
+        def delete_confirmed(instance):
+            self.viewmodel.delete_image(img_path)
+
+            if img_path in self.images:
+                self.images.remove(img_path)
+
+            popup.dismiss()
+            self.refresh_files()
+
+        delete_btn.bind(on_press=delete_confirmed)
+
+        popup.open()
