@@ -16,14 +16,6 @@ class ImageViewScreen(Screen):
         self.img_widget = Image()
         layout.add_widget(self.img_widget)
 
-        # --- Prev/Next gombok ---
-        # btn_layout = BoxLayout(size_hint=(1, 0.1))
-        # prev_btn = Button(text="Prev")
-        # next_btn = Button(text="Next")
-        # btn_layout.add_widget(prev_btn)
-        # btn_layout.add_widget(next_btn)
-        # layout.add_widget(btn_layout)
-
         # --- Vissza gomb ---
         back_btn = Factory.RoundedButton(text="Back", size_hint_y=1, size_hint_x=None, width=100)
         back_btn.bind(on_press=self.go_back)
@@ -36,13 +28,6 @@ class ImageViewScreen(Screen):
         layout.add_widget(back_layout)
 
         self.add_widget(layout)
-
-        # --- Bind ViewModelhez ---
-        # self.viewmodel.bind(current_image=self.update_image)
-
-        # --- Gomb események ---
-        # prev_btn.bind(on_press=lambda x: self.viewmodel.prev_image())
-        # next_btn.bind(on_press=lambda x: self.viewmodel.next_image())
 
     def on_enter(self):
         self.viewmodel.bind(current_image=self.update_image)

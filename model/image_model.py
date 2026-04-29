@@ -1,11 +1,20 @@
 import os
+import sys
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
 import spacy
 import torch
+import nltk
 from nltk.corpus import wordnet as wn
 import clip
 from PIL.ExifTags import TAGS
+
+def resource_path(relative_path):
+    if hasattr(sys, "_MEIPASS"):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
+nltk.data.path.append(resource_path("nltk_data"))
 
 class ImageModel:
     MAIN_CATEGORIES = {
@@ -21,12 +30,16 @@ class ImageModel:
     def __init__(self):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
+        blip_path = resource_path(os.path.join("models", "blip"))
+
+        model_path = resource_path("en_core_web_sm")
+
         self.blip_processor = BlipProcessor.from_pretrained(
-            "models/blip",
+            blip_path,
             local_files_only=True
         )
         self.blip_model = BlipForConditionalGeneration.from_pretrained(
-            "models/blip",
+            blip_path,
             local_files_only=True
         )
 
@@ -36,7 +49,7 @@ class ImageModel:
         self.clip_model.to(self.device)
         self.clip_model.eval()
         
-        self.nlp = spacy.load("en_core_web_sm")
+        self.nlp = spacy.load(model_path)
 
     # ------------------- VECTOR ------------------------
     def get_image_embedding(self, image_path):

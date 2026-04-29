@@ -149,7 +149,7 @@ class ImageViewModel(EventDispatcher):
             if token.pos_ in ("NOUN", "PROPN")
         ]
     
-    def search_images(self, prompt: str, threshold: float = 0.20):
+    def search_images(self, prompt: str, threshold: float = 0.25):
 
         base_dir = os.path.dirname(os.path.dirname(__file__))
         json_path = os.path.join(base_dir, "assets", "images.json")
